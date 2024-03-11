@@ -4,7 +4,6 @@ import { s3 } from "../../aws";
 
 export async function POST(req: NextRequest, res: NextResponse) {
   const body = await req.json();
-  console.log("body", body);
 
   const s3Params = {
     Bucket: process.env.AWS_BUCKET_NAME,
