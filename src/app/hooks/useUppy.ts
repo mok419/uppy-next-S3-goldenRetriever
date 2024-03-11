@@ -4,7 +4,6 @@ import AwsS3, { type AwsS3Options } from '@uppy/aws-s3'
 
 import GoldenRetriever from '@uppy/golden-retriever';
 
-//@ts-ignore as we cant manually type trpcClient due to it being a hook (only can instantiate in a component)
 const initializeUppy = (): Uppy => {
   const uppy = new Uppy({
     // autoProceed: true,
