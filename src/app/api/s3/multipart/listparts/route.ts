@@ -15,7 +15,5 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const {Parts} = await s3.listParts(s3Params).promise()
 
 
-  return Response.json({
-   parts: Parts,
-  });
+  return Response.json(Parts);
 }

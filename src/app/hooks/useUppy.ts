@@ -4,7 +4,6 @@ import AwsS3, { type AwsS3Options } from '@uppy/aws-s3'
 
 import GoldenRetriever from '@uppy/golden-retriever';
 
-//@ts-ignore as we cant manually type trpcClient due to it being a hook (only can instantiate in a component)
 const initializeUppy = (): Uppy => {
   const uppy = new Uppy({
     // autoProceed: true,
@@ -109,7 +108,7 @@ const initializeUppy = (): Uppy => {
         })
       },
     })
-    .use(GoldenRetriever, { serviceWorker: true })
+    .use(GoldenRetriever)
 
   return uppy
 }
@@ -127,25 +126,7 @@ function useUppy() {
       }
     }
   }, [])
-
-  useEffect(() => {
-    if (uppy) {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker
-          .register('/sw.js') // path to your bundled service worker with GoldenRetriever service worker
-          .then((registration) => {
-            console.log(
-              'ServiceWorker registration successful with scope: ',
-              registration.scope,
-            );
-          })
-          .catch((error) => {
-            console.log(`Registration failed with ${error}`);
-          });
-      }
-    }
-  }, [uppy]) // This effect runs whenever `uppy` changes
-
+  
   return uppy
 }
 
