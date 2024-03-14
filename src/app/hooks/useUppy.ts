@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
-import Uppy from '@uppy/core'
-import AwsS3, { type AwsS3Options } from '@uppy/aws-s3'
+import { useEffect, useRef, useState } from "react";
+import Uppy from "@uppy/core";
+import AwsS3, { type AwsS3Options } from "@uppy/aws-s3";
 
-import GoldenRetriever from '@uppy/golden-retriever';
+import GoldenRetriever from "@uppy/golden-retriever";
 
 const initializeUppy = (): Uppy => {
   const uppy = new Uppy({
@@ -10,124 +10,126 @@ const initializeUppy = (): Uppy => {
     debug: true,
   })
     .use(AwsS3, {
-        shouldUseMultipart(file) {
-          console.log('file size', file.size)
-          return file.size > 5 * 0x10_00_00 //100MB minimum
-        },
-        getChunkSize(fileSize) { //could dynamically define chunk sizes based on file size
-          return 5 * 0x10_00_00; // 100MB chunk
-        },
+      limit: 2,
+      shouldUseMultipart(file) {
+        console.log("file size", file.size);
+        return file.size > 5 * 0x10_00_00; //100MB minimum
+      },
+      getChunkSize(fileSize) {
+        //could dynamically define chunk sizes based on file size
+        return 5 * 0x10_00_00; // 100MB chunk
+      },
       getUploadParameters: async (file) => {
-        return fetch('api/s3/single/signupload', {
-          method: 'post',
+        return fetch("api/s3/single/signupload", {
+          method: "post",
           body: JSON.stringify({
             filename: file.name,
-            type: file.type
+            type: file.type,
           }),
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         }).then((response) => {
-          return response.json()
-        })
+          return response.json();
+        });
       },
       createMultipartUpload: async (file) => {
-        return fetch('api/s3/multipart/start', {
-          method: 'post',
+        return fetch("api/s3/multipart/start", {
+          method: "post",
           body: JSON.stringify({
             filename: file.name,
-            type: file.type
+            type: file.type,
           }),
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         }).then((response) => {
-          return response.json()
-        })
+          return response.json();
+        });
       },
       signPart: async (file, options) => {
-        const { uploadId, key, partNumber, signal } = options
-        return fetch('api/s3/multipart/signpart', {
-          method: 'post',
+        const { uploadId, key, partNumber, signal } = options;
+        return fetch("api/s3/multipart/signpart", {
+          method: "post",
           body: JSON.stringify({
             uploadId,
             key,
-            partNumber
+            partNumber,
           }),
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
         }).then((response) => {
-          return response.json()
-        })
+          return response.json();
+        });
       },
       completeMultipartUpload: async (file, options) => {
-        const { uploadId, key, parts } = options
-        return fetch('api/s3/multipart/complete', {
-          method: 'post',
+        const { uploadId, key, parts } = options;
+        return fetch("api/s3/multipart/complete", {
+          method: "post",
           body: JSON.stringify({
             uploadId,
             key,
-            parts
+            parts,
           }),
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
         }).then((response) => {
-          return response.json()
-        })
+          return response.json();
+        });
       },
       listParts: async (file, options) => {
-        const { uploadId, key } = options
-        return fetch('api/s3/multipart/listparts', {
-          method: 'post',
+        const { uploadId, key } = options;
+        return fetch("api/s3/multipart/listparts", {
+          method: "post",
           body: JSON.stringify({
             uploadId,
-            key
+            key,
           }),
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
         }).then((response) => {
-          return response.json()
-        })
+          return response.json();
+        });
       },
       abortMultipartUpload: async (file, options) => {
-        const { uploadId, key } = options
-        return fetch('api/s3/multipart/abort', {
-          method: 'post',
+        const { uploadId, key } = options;
+        return fetch("api/s3/multipart/abort", {
+          method: "post",
           body: JSON.stringify({
             uploadId,
-            key
+            key,
           }),
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
         }).then((response) => {
-          return response.json()
-        })
+          return response.json();
+        });
       },
     })
-    .use(GoldenRetriever)
+    .use(GoldenRetriever);
 
-  return uppy
-}
+  return uppy;
+};
 
 function useUppy() {
-  const [uppy, setUppy] = useState<Uppy | undefined>(undefined)
+  const [uppy, setUppy] = useState<Uppy | undefined>(undefined);
 
   useEffect(() => {
-    setUppy(initializeUppy())
+    setUppy(initializeUppy());
 
     return () => {
       if (uppy) {
-        uppy.close()
-        setUppy(undefined)
+        uppy.close();
+        setUppy(undefined);
       }
-    }
-  }, [])
-  
-  return uppy
+    };
+  }, []);
+
+  return uppy;
 }
 
-export default useUppy
+export default useUppy;
